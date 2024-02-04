@@ -8,5 +8,22 @@ A powerful and easy-to-use library for numerically solving systems of linear alg
 
 ## Installation
 
-use cmake
+```sh
+mkdir build
+cd build
+cmake ..
+make
+cd ..
+sudo ./install.sh
 
+```
+### Testing
+
+```sh
+cd test
+mkdir build
+cd build
+cmake ..
+make
+./main
+```

@@ -5,11 +5,8 @@ project(main)
 
 add_executable(main src/main.cpp)
 
-target_include_directories(main PRIVATE ../inc)
-
 find_package(GTest REQUIRED)
 include_directories(${GTEST_INCLUDE_DIRS})
 
-target_link_directories(main PUBLIC ../build)
-target_link_libraries(main alineofpotatoes ${GTEST_LIBRARIES} pthread)
+target_link_libraries(main ALOP ${GTEST_LIBRARIES} pthread)
 

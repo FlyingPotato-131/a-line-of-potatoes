@@ -1,4 +1,5 @@
-#include <tri-diag-matrix.h>
+// #include <tri-diag-matrix.h>
+#include <ALOP/tri-diag-matrix.h>
 #include <vector>
 #include <iostream>
 #include <gtest/gtest.h>
