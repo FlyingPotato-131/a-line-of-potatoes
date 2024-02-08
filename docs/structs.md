@@ -2,7 +2,7 @@
 
 #### triDiagMatrix
 included in <tri-diag-matrix.h>  
-structure containing a [tridiagonal matrix](https://en.wikipedia.org/wiki/Tridiagonal_matrix)
+structure containing a [tridiagonal matrix](https://en.wikipedia.org/wiki/Tridiagonal_matrix)  
 example usage:
 ```cpp
 //11  2  0  0  0
