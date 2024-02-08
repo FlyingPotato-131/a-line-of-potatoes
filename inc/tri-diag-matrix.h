@@ -7,4 +7,4 @@ struct triDiagMatrix{
 	std::vector<double> c;
 };
 
-std::vector<double> thomasMethod(triDiagMatrix A, std::vector<double> f);
+std::vector<double> thomasMethod(const triDiagMatrix &A, const std::vector<double> &f);
