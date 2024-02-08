@@ -1,6 +1,6 @@
 ## Documentation of functions in ALOP
 #### thomasMethod(triDiagMatrix, std::vector\<double>)
-included in <tri-diag-matrix.h>
+included in <tri-diag-matrix.h>  
 function that solves a system of linear equations Ax = f where A is a tridiagonal matrix using the [Thomas method](https://en.wikipedia.org/wiki/Tridiagonal_matrix_algorithm)
 arguments:
 ```cpp

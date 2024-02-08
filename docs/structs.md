@@ -1,7 +1,7 @@
 ## Documentation of structs in ALOP
 
 #### triDiagMatrix
-included in <tri-diag-matrix.h>
+included in <tri-diag-matrix.h>  
 structure containing a [tridiagonal matrix](https://en.wikipedia.org/wiki/Tridiagonal_matrix)
 example usage:
 ```cpp
