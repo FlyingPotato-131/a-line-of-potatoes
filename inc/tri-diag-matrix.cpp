@@ -1,6 +1,6 @@
 #include "tri-diag-matrix.h"
 
-std::vector<double> thomasMethod(triDiagMatrix A, std::vector<double> f){
+std::vector<double> thomasMethod(const triDiagMatrix &A, const std::vector<double> &f){
 	size_t n = f.size() - 1;
 
 	bool hasstrict = 0;
