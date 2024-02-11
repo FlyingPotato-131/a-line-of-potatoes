@@ -1,6 +1,9 @@
-cmake_minimum_required(VERSION 3.28)
-
-set(CMAKE_CXX_FLAGS "-g")
+cmake_minimum_required(VERSION 3.20)
 project(ALOP)
-add_library( ALOP STATIC inc/tri-diag-matrix.cpp )
 
+add_subdirectory(src)
+
+if (WITH_TESTS)
+    enable_testing()
+    add_subdirectory(test)
+endif ()

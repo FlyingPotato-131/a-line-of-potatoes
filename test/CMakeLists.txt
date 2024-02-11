@@ -1,12 +1,13 @@
-cmake_minimum_required(VERSION 3.28)
-
-set(CMAKE_CXX_FLAGS "-g")
-project(main)
-
-add_executable(main src/main.cpp)
-
 find_package(GTest REQUIRED)
-include_directories(${GTEST_INCLUDE_DIRS})
 
-target_link_libraries(main ALOP ${GTEST_LIBRARIES} pthread)
+file(GLOB_RECURSE TEST_SOURCES test-*.cpp)
+
+foreach (TEST_FILE IN LISTS TEST_SOURCES)
+    get_filename_component(TEST_FILE_NAME ${TEST_FILE} NAME_WE)
+    set(EXECUTABLE_NAME run_${TEST_FILE_NAME})
+    add_executable(${EXECUTABLE_NAME} ${TEST_FILE})
+    target_compile_options(${EXECUTABLE_NAME} PRIVATE -Werror -Wall -Wextra -pedantic -Wshadow -Wconversion -Wsign-conversion)
+    target_link_libraries(${EXECUTABLE_NAME} PRIVATE ${PROJECT_NAME} GTest::gtest_main)
+    add_test(NAME ${EXECUTABLE_NAME} COMMAND ${EXECUTABLE_NAME})
+endforeach ()
 
