@@ -1,4 +1,4 @@
-#include <ALOP/tri-diag-matrix.h>
+#include "tri-diag-matrix.h"
 #include <vector>
 #include <iostream>
 #include <gtest/gtest.h>
@@ -43,9 +43,4 @@ TEST(Thomas_Method, throw_0){
 	std::vector<double> f = {3, 2, 3, 0, 3, 7, 8, 3, 4, 3, 9, 10, 5, 8};
 	std::vector<double> result;
 	EXPECT_THROW({thomasMethod(&A, &f, &result);}, std::invalid_argument);
-}
-
-int main(){
-	testing::InitGoogleTest();
-    return RUN_ALL_TESTS();
 }

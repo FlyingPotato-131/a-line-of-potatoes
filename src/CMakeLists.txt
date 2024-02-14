@@ -3,12 +3,17 @@ if (USE_GLOB)
     add_library(${MODULE_NAME} STATIC ${SOURCES})
 else ()
     set(HEADERS
-	tri-diag-matrix.h
-        )
+    	tri-diag-matrix.h
+        dense-matrix.h
+        csr-matrix.h
+        vector-operations.h
+    )
 
     set(SOURCES
-	tri-diag-matrix.cpp
-        )
+        tri-diag-matrix.cpp
+        dense-matrix.cpp
+        csr-matrix.cpp
+    )
 
     source_group("Header Files" FILES ${HEADERS})
     source_group("Source Files" FILES ${SOURCES})
