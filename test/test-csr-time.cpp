@@ -11,7 +11,7 @@
 // 		for(size_t i = (size - 100) * (size - 100); i <= size * size; i++){
 // 			data.push_back(std::rand());
 // 		}
-// 		csrMatrix<int> mtr = csrMatrix<int>(&data, size);
+// 		csrMatrix<int> mtr = csrMatrix<int>(data, size);
 
 // 		for(size_t i = (size - 100); i <= size; i++){
 // 			v.push_back(std::rand());
@@ -35,7 +35,7 @@ TEST(csr, sparse){
 			int n = std::rand();
 			data.push_back(n < RAND_MAX / 20 ? n : 0);
 		}
-		csrMatrix<int> mtr = csrMatrix<int>(&data, size);
+		csrMatrix<int> mtr = csrMatrix<int>(data, size);
 
 		for(size_t i = (size - 100); i <= size; i++){
 			v.push_back(std::rand());

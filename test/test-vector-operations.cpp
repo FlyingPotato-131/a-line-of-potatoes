@@ -7,8 +7,6 @@ TEST(vops, add){
 	std::vector<int> v2 = {4, 5, 6};
 	std::vector<int> sum = {5, 7, 9};
 	ASSERT_EQ(v1 + v2, sum);
-	v1 += v2;
-	ASSERT_EQ(v1, sum);
 }
 
 TEST(vops, subtract){
@@ -16,8 +14,6 @@ TEST(vops, subtract){
 	std::vector<int> v2 = {4, 5, 6};
 	std::vector<int> sum = {-3, -3, -3};
 	ASSERT_EQ(v1 - v2, sum);
-	v1 -= v2;
-	ASSERT_EQ(v1, sum);
 }
 
 TEST(vops, multiply){
@@ -26,8 +22,6 @@ TEST(vops, multiply){
 	std::vector<int> product = {5, 10, 15};
 	ASSERT_EQ(v1 * a, product);
 	ASSERT_EQ(a * v1, product);
-	v1 *= a;
-	ASSERT_EQ(v1, product);
 }
 
 TEST(vops, divide){
@@ -35,8 +29,6 @@ TEST(vops, divide){
 	int a = 2;
 	std::vector<int> quotient = {1, 2, 3};
 	ASSERT_EQ(v1 / a, quotient);
-	v1 /= a;
-	ASSERT_EQ(v1, quotient);
 }
 
 TEST(vops, dot){

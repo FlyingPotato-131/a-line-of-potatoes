@@ -36,7 +36,7 @@ TEST(csr, sparse){
 			int n = std::rand();
 			data.push_back(n < RAND_MAX / 20 ? n : 0);
 		}
-		csrMatrix<int> mtr = csrMatrix<int>(&data, size);
+		denseMatrix<int> mtr = denseMatrix<int>(data, size);
 
 		for(size_t i = (size - 100); i <= size; i++){
 			v.push_back(std::rand());
