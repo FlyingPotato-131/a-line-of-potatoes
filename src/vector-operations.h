@@ -1,5 +1,7 @@
+#pragma once
 #include <vector>
 #include <stdint.h>
+#include <cmath>
 
 template<typename T>
 std::vector<T> operator+(const std::vector<T> &a, const std::vector<T> &b){
@@ -49,4 +51,14 @@ T dot(const std::vector<T> &a, const std::vector<T> &b){
 		ret += a[i] * b[i];
 	}
 	return ret;
+}
+
+template<typename T>
+T abs(const std::vector<T> &v){
+	return sqrt(dot(v, v));
+}
+
+template<typename T>
+T sign(T n){
+	return n < 0 ? -1 : n > 0 ? 1 : 0;
 }
