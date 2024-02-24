@@ -18,14 +18,10 @@ public:
 	size_t height() const;
 	size_t width() const;
 	const std::vector<T> &data() const;
-	std::vector<T> column(size_t w);
 	const std::vector<T> column(size_t w) const;
-	std::vector<T> row(size_t h);
 	const std::vector<T> row(size_t h) const;
-	std::vector<T> operator*(const std::vector<T> &v);
-	denseMatrix<T> operator*(T x);
+	std::vector<T> operator*(const std::vector<T> &v) const;
 	const denseMatrix<T> operator*(T x) const;
-	denseMatrix<T> operator/(T x);
 	const denseMatrix<T> operator/(T x) const;
 };
 
@@ -99,7 +95,7 @@ bool operator==(const denseMatrix<T> &m1, const denseMatrix<T> &m2){
 }
 
 template<typename T>
-std::vector<T> denseMatrix<T>::operator*(const std::vector<T> &v){
+std::vector<T> denseMatrix<T>::operator*(const std::vector<T> &v) const{
 	std::vector<T> ret;
 	for(size_t row = 0; row < this->__data.size() / this->__width; row++){
 		T sum = 0;
@@ -112,26 +108,12 @@ std::vector<T> denseMatrix<T>::operator*(const std::vector<T> &v){
 }
 
 template<typename T>
-denseMatrix<T> denseMatrix<T>::operator*(T x){
-	denseMatrix<T> ret = denseMatrix<T>(this->__data.size() / this->__width, this->__width);
-	for(size_t h = 0; h < this->__data.size() / this->__width; h++)
-		for(size_t w = 0; w < this->__width; w++)
-			ret(h, w) = (*this)(h, w) * x;
-	return ret;
-}
-
-template<typename T>
 const denseMatrix<T> denseMatrix<T>::operator*(T x) const{
 	denseMatrix<T> ret = denseMatrix<T>(this->__data.size() / this->__width, this->__width);
 	for(size_t h = 0; h < this->__data.size() / this->__width; h++)
 		for(size_t w = 0; w < this->__width; w++)
 			ret(h, w) = (*this)(h, w) * x;
 	return ret;
-}
-
-template<typename T>
-denseMatrix<T> denseMatrix<T>::operator/(T x){
-	return (*this) * (1 / x);
 }
 
 template<typename T>
@@ -165,28 +147,10 @@ denseMatrix<T> operator*(const denseMatrix<T> &m1, const denseMatrix<T> &m2){
 }
 
 template<typename T>
-std::vector<T> denseMatrix<T>::column(size_t w){
-	std::vector<T> ret = std::vector<T>(this->height());
-	for(size_t h = 0; h < this->height(); h++){
-		ret[h] = (*this)(h, w);
-	}
-	return ret;
-}
-
-template<typename T>
 const std::vector<T> denseMatrix<T>::column(size_t w) const{
 	std::vector<T> ret = std::vector<T>(this->height());
 	for(size_t h = 0; h < this->height(); h++){
 		ret[h] = (*this)(h, w);
-	}
-	return ret;
-}
-
-template<typename T>
-std::vector<T> denseMatrix<T>::row(size_t h){
-	std::vector<T> ret = std::vector<T>(this->width());
-	for(size_t w = 0; w < this->width(); w++){
-		ret[w] = (*this)(h, w);
 	}
 	return ret;
 }
