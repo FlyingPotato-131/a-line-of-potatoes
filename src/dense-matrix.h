@@ -33,6 +33,7 @@ denseMatrix<T>::denseMatrix(const std::vector<T> &rawdata, std::size_t w){
 
 template<typename T>
 denseMatrix<T>::denseMatrix(const std::vector<std::vector<T>> &rawdata){
+	this->__data.reserve(rawdata.size() * rawdata[0].size());
 	this->__width = rawdata[0].size();
 	for(std::vector<T> row : rawdata){
 		for(T element : row){
@@ -96,13 +97,13 @@ bool operator==(const denseMatrix<T> &m1, const denseMatrix<T> &m2){
 
 template<typename T>
 std::vector<T> denseMatrix<T>::operator*(const std::vector<T> &v) const{
-	std::vector<T> ret;
+	std::vector<T> ret = std::vector<T>(this->height());
 	for(size_t row = 0; row < this->__data.size() / this->__width; row++){
 		T sum = 0;
 		for(size_t i = 0; i < this->__width; i++){
 			sum += (*this)(row, i) * v[i];
 		}
-		ret.push_back(sum);
+		ret[row] = sum;
 	}
 	return ret;
 }

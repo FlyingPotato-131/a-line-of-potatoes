@@ -16,21 +16,32 @@ public:
 };
 
 template<typename T>
-csrMatrix<T>::csrMatrix(const std::vector<T> &data, size_t width){
-	this->rows = {0};
+csrMatrix<T>::csrMatrix(const std::vector<T> &data, size_t width) : rows(data.size() / width + 1){
+	size_t len = 0;
+	for(T value : data){
+		if(value != 0){
+			len++;
+		}
+	}
+	this->values.reserve(len);
+	this->columns.reserve(len);
+	this->rows[0] = 0;
+	size_t count = 0;
 	for(size_t i = 0; i < data.size(); i++){
 		if(data[i] != 0){
 			this->values.push_back(data[i]);
 			this->columns.push_back(i % width);
+			count++;
 		}
 		if(i % width == width - 1){
-			size_t count = 0;
-			for(size_t p = 0; p <= i; p++){
-				if(data[p] != 0){
-					count ++;
-				}
-			}
-			this->rows.push_back(count);
+			// size_t count = 0;
+			// for(size_t p = 0; p <= i; p++){
+			// 	if(data[p] != 0){
+			// 		count ++;
+			// 	}
+			// }
+			this->rows[i / width + 1] = count;
+			// count = 0;
 		}
 	}
 }
