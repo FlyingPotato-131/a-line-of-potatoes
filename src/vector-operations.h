@@ -5,27 +5,27 @@
 
 template<typename T>
 std::vector<T> operator+(const std::vector<T> &a, const std::vector<T> &b){
-	std::vector<T> ret;
+	std::vector<T> ret = std::vector<T>(a.size());
 	for(size_t i = 0; i < a.size(); i++){
-		ret.push_back(a[i] + b[i]);
+		ret[i] = a[i] + b[i];
 	}
 	return ret;
 }
 
 template<typename T>
 std::vector<T> operator-(const std::vector<T> &a, const std::vector<T> &b){
-	std::vector<T> ret;
+	std::vector<T> ret = std::vector<T>(a.size());
 	for(size_t i = 0; i < a.size(); i++){
-		ret.push_back(a[i] - b[i]);
+		ret[i] = a[i] - b[i];
 	}
 	return ret;
 }
 
 template<typename T>
 std::vector<T> operator*(const std::vector<T> &v, T n){
-	std::vector<T> ret;
+	std::vector<T> ret = std::vector<T>(v.size());
 	for(size_t i = 0; i < v.size(); i++){
-		ret.push_back(v[i] * n);
+		ret[i] = v[i] * n;
 	}
 	return ret;
 }
@@ -37,9 +37,18 @@ std::vector<T> operator*(T n, const std::vector<T> &v){
 
 template<typename T>
 std::vector<T> operator/(const std::vector<T> &v, T n){
-	std::vector<T> ret;
+	std::vector<T> ret = std::vector<T>(v.size());
 	for(size_t i = 0; i < v.size(); i++){
-		ret.push_back(v[i] / n);
+		ret[i] = v[i] / n;
+	}
+	return ret;
+}
+
+template<typename T>
+std::vector<T> operator*(const std::vector<T> &a, const std::vector<T> &b){
+	std::vector<T> ret = std::vector<T>(a.size());
+	for(size_t i = 0; i < a.size(); i++){
+		ret[i] = a[i] * b[i];
 	}
 	return ret;
 }

@@ -31,6 +31,13 @@ TEST(vops, divide){
 	ASSERT_EQ(v1 / a, quotient);
 }
 
+TEST(vops, mul){
+	std::vector<int> v1 = {1, 2, 3};
+	std::vector<int> v2 = {4, 5, 6};
+	std::vector<int> product = {4, 10, 18};
+	ASSERT_EQ(v1 * v2, product);	
+}
+
 TEST(vops, dot){
 	std::vector<int> v1 = {1, 2, 3};
 	std::vector<int> v2 = {4, 5, 6};
