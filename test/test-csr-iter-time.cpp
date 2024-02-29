@@ -16,7 +16,7 @@ TEST(csr, iter_convergence_compare){
 	csrMatrix<double> mtr = csrMatrix<double>(mtrData, 9);
 	std::vector<double> v = {-7, -9, -5, 8, -8, -6, -8, 1, -8};
 	std::vector<double> start = {100, 100, 100, 100, 100, 100, 100, 100, 100};
-	std::vector<double> res = {-2.90666666666666667, -4.8, -10.23265306122448980, 2.06666666666666667, -1.14285714285714286, 0.42857142857142857, 16.81877551020408163, 33.31428571428571429, -6.06666666666666667};
+	// std::vector<double> res = {-2.90666666666666667, -4.8, -10.23265306122448980, 2.06666666666666667, -1.14285714285714286, 0.42857142857142857, 16.81877551020408163, 33.31428571428571429, -6.06666666666666667};
 
 	std::ofstream data;
 	data.open("../timestamps-iter-convergence-compare/data.csv");
@@ -26,19 +26,19 @@ TEST(csr, iter_convergence_compare){
 		data << N << ",";
 
 		auto startTime = std::chrono::high_resolution_clock::now();
-		double error = abs(simpleIterMethod(mtr, v, start, 0.0, N, 0.25) - res) / abs(res);
+		double error = abs(v - mtr * simpleIterMethod(mtr, v, start, 0.0, N, 0.25)) / abs(v);
 		auto endTime = std::chrono::high_resolution_clock::now();
 		auto dtime = duration_cast<std::chrono::microseconds>(endTime - startTime).count();
 		data << dtime << "," << error << ",";
 
 		startTime = std::chrono::high_resolution_clock::now();
-		error = abs(jakobiMethod(mtr, v, start, 0.0, N) - res) / abs(res);
+		error = abs(v - mtr * jakobiMethod(mtr, v, start, 0.0, N)) / abs(v);
 		endTime = std::chrono::high_resolution_clock::now();
 		dtime = duration_cast<std::chrono::microseconds>(endTime - startTime).count();
 		data << dtime << "," << error << ",";
 
 		startTime = std::chrono::high_resolution_clock::now();
-		error = abs(gaussSeidelMethod(mtr, v, start, 0.0, N) - res) / abs(res);
+		error = abs(v - mtr * gaussSeidelMethod(mtr, v, start, 0.0, N)) / abs(v);
 		endTime = std::chrono::high_resolution_clock::now();
 		dtime = duration_cast<std::chrono::microseconds>(endTime - startTime).count();
 		data << dtime << "," << error << "\n";
