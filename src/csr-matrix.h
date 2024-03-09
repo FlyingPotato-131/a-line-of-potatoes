@@ -3,6 +3,8 @@
 #include <stdint.h>
 #include <vector-operations.h>
 #include <functional>
+#include <math.h>
+#include <iostream>
 
 template<typename T>
 struct csrMatrix{
@@ -101,6 +103,36 @@ template<typename T>
 std::vector<T> simpleIterMethod(const csrMatrix<T> &mtr, const std::vector<T> &v, const std::vector<T> &start, const T tolerance, const size_t Nmax, const T tau){
 	std::vector<T> current = start;
 	for(size_t n = 0; n < Nmax; n++){
+		current = current - tau * (mtr * current - v);
+
+		bool done = 1;
+		for(T error : mtr * current - v){
+			if(std::abs(error) > tolerance){
+				done = 0;
+				break;
+			}
+		}
+		if(done){
+			break;
+		}
+	}
+	return current;
+}
+
+template<typename T>
+std::vector<T> chebyshevSIM(const csrMatrix<T> &mtr, const std::vector<T> &v, const std::vector<T> &start, const T tolerance, const size_t Nmax, const T eigenMin, const T eigenMax){
+	std::vector<size_t> indices(size_t(pow(2, size_t(ceil(log2(Nmax))))));
+	indices[0] = 0;
+	indices[indices.size() / 2] = 1;
+	for(size_t r = 2; r <= size_t(ceil(log2(Nmax))); r++){
+		for(size_t i = 1; i < size_t(pow(2, r)); i+= 2){
+			indices[size_t(double(i) * (double)indices.size() / pow(2, r))] = size_t(pow(2, r)) - 1 - indices[size_t(double(i - 1) * (double)indices.size() / pow(2, r))];
+		}
+	}
+
+	std::vector<T> current = start;
+	for(size_t n = 0; n < Nmax; n++){
+		const T tau = 1 / ((eigenMax + eigenMin) / 2 + (eigenMax - eigenMin) / 2 * cos(M_PI * double(2 * indices[n] + 1) / 2 / double(Nmax)));
 		current = current - tau * (mtr * current - v);
 
 		bool done = 1;

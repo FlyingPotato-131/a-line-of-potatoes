@@ -44,6 +44,18 @@ TEST(csr, simple_iter_method){
 	}
 }
 
+TEST(csr, chebyshev_SIM){
+	std::vector<double> data = {5, -2, 0, -1, -2, 3, 0, -0.2, 0, 0, 7, 0, -1, -0.2, 0, 2};
+	csrMatrix<double> mtr = csrMatrix<double>(data, 4);
+	std::vector<double> v = {-4, 0, -2, 9};
+	std::vector<double> start = {1, 1, 1, 1};
+	std::vector<double> res = chebyshevSIM(mtr, v, start, 0.0001, 1000, 1.129, 7.0);
+	std::vector<double> correct = {0.37555555555555556, 0.56666666666666667, -0.28571428571428571, 4.74444444444444444};
+	for(size_t i = 0; i < res.size(); i++){
+		ASSERT_NEAR(res[i], correct[i], 0.0001);
+	}
+}
+
 TEST(csr, jakobi_method){
 	std::vector<double> data = {5, -2, 0, -1, -2, 3, 0, -0.2, 0, 0, 7, 0, -1, -0.2, 0, 2};
 	csrMatrix<double> mtr = csrMatrix<double>(data, 4);
