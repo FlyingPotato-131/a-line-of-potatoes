@@ -8,7 +8,7 @@
 
 template<typename T>
 struct csrMatrix{
-private:
+public:
 	std::vector<T> values;
 	std::vector<size_t> columns;
 	std::vector<size_t> rows;
@@ -117,6 +117,28 @@ std::vector<T> simpleIterMethod(const csrMatrix<T> &mtr, const std::vector<T> &v
 		}
 	}
 	return current;
+}
+
+template<typename T>
+size_t simpleIterMethodCounter(const csrMatrix<T> &mtr, const std::vector<T> &v, const std::vector<T> &start, const T tolerance, const size_t Nmax, const T tau){
+	size_t count = 0;
+	std::vector<T> current = start;
+	for(size_t n = 0; n < Nmax; n++){
+		current = current - tau * (mtr * current - v);
+		count++;
+
+		bool done = 1;
+		for(T error : mtr * current - v){
+			if(std::abs(error) > tolerance){
+				done = 0;
+				break;
+			}
+		}
+		if(done){
+			break;
+		}
+	}
+	return count;
 }
 
 template<typename T>
