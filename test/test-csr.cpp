@@ -81,6 +81,30 @@ TEST(csr, gauss_seidel_method){
 	}
 }
 
+TEST(csr, gradient_descent){
+	std::vector<double> data = {5, -2, 0, -1, -2, 3, 0, -0.2, 0, 0, 7, 0, -1, -0.2, 0, 2};
+	csrMatrix<double> mtr = csrMatrix<double>(data, 4);
+	std::vector<double> v = {-4, 0, -2, 9};
+	std::vector<double> start = {1, 1, 1, 1};
+	std::vector<double> res = gradientDescent(mtr, v, start, 0.0001, 1000);
+	std::vector<double> correct = {0.37555555555555556, 0.56666666666666667, -0.28571428571428571, 4.74444444444444444};
+	for(size_t i = 0; i < res.size(); i++){
+		ASSERT_NEAR(res[i], correct[i], 0.0001);
+	}
+}
+
+TEST(csr, sym_gauss_seidel_method){
+	std::vector<double> data = {5, -2, 0, -1, -2, 3, 0, -0.2, 0, 0, 7, 0, -1, -0.2, 0, 2};
+	csrMatrix<double> mtr = csrMatrix<double>(data, 4);
+	std::vector<double> v = {-4, 0, -2, 9};
+	std::vector<double> start = {1, 1, 1, 1};
+	std::vector<double> res = symGaussSeidelMethod(mtr, v, start, 0.0001, 1000);
+	std::vector<double> correct = {0.37555555555555556, 0.56666666666666667, -0.28571428571428571, 4.74444444444444444};
+	for(size_t i = 0; i < res.size(); i++){
+		ASSERT_NEAR(res[i], correct[i], 0.0001);
+	}
+}
+
 // TEST(csr, problem1){
 // 	std::vector<int> data = {8, 9, 0, 7, 1, 6, 0, 1, 2, 8, 3, 0, 9, 0, 0, 1};
 // 	csrMatrix<int> mtr(data, 4);
@@ -114,20 +138,20 @@ TEST(csr, gauss_seidel_method){
 // 	}}}}	
 // }
 
-TEST(csr, problem4){
-	std::vector<double> data = {95, 0, 6, 0, 6, 50, 0, 0, 3, 8, 72, 0, 6, 0, 0, 70};
-	// std::vector<double> data = {333, 0, 0, 0, 0, 333, 0, 0, 0, 0, 333, 0, 0, 0, 0, 333};
-	csrMatrix<double> mtr(data, 4);
-	std::vector<double> v = {1, 1, 1, 1};
-	std::vector<double> start = {0, 0, 0, 0};
+// TEST(csr, problem4){
+// 	std::vector<double> data = {95, 0, 6, 0, 6, 50, 0, 0, 3, 8, 72, 0, 6, 0, 0, 70};
+// 	// std::vector<double> data = {333, 0, 0, 0, 0, 333, 0, 0, 0, 0, 333, 0, 0, 0, 0, 333};
+// 	csrMatrix<double> mtr(data, 4);
+// 	std::vector<double> v = {1, 1, 1, 1};
+// 	std::vector<double> start = {0, 0, 0, 0};
 
-	std::ofstream results;
-	results.open("../counts-problem-4.csv");
-	results << "tau, Niter\n";
+// 	std::ofstream results;
+// 	results.open("../counts-problem-4.csv");
+// 	results << "tau, Niter\n";
 
-	for(double tau = 0.03; tau > 0.01; tau -= 0.0001){
-	// for(double tau = 1; tau > 0.001; tau -= 0.0001){
-		size_t iterations = simpleIterMethodCounter(mtr, v, start, 1e-12, 10000, tau);
-		results << tau << "," << iterations << "\n";
-	}
-}
+// 	for(double tau = 0.03; tau > 0.01; tau -= 0.0001){
+// 	// for(double tau = 1; tau > 0.001; tau -= 0.0001){
+// 		size_t iterations = simpleIterMethodCounter(mtr, v, start, 1e-12, 10000, tau);
+// 		results << tau << "," << iterations << "\n";
+// 	}
+// }

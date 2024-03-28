@@ -100,9 +100,9 @@ T csrMatrix<T>::mulRow(const std::vector<T> &v, size_t row, const std::function<
 }
 
 template<typename T>
-std::vector<T> simpleIterMethod(const csrMatrix<T> &mtr, const std::vector<T> &v, const std::vector<T> &start, const T tolerance, const size_t Nmax, const T tau){
+std::vector<T> simpleIterMethod(const csrMatrix<T> &mtr, const std::vector<T> &v, const std::vector<T> &start, const T tolerance, const size_t nmax, const T tau){
 	std::vector<T> current = start;
-	for(size_t n = 0; n < Nmax; n++){
+	for(size_t n = 0; n < nmax; n++){
 		current = current - tau * (mtr * current - v);
 
 		bool done = 1;
@@ -204,6 +204,56 @@ std::vector<T> gaussSeidelMethod(const csrMatrix<T> &mtr, const	std::vector<T> &
 			T tmp = mtr.mulRow(current, h, [](size_t tmph, size_t tmpw) -> bool {return tmph != tmpw;});
 			current[h] = Dh * (v[h] - tmp);
 		}
+
+		bool done = 1;
+		for(T error : mtr * current - v){
+			if(std::abs(error) > tolerance){
+				done = 0;
+				break;
+			}
+		}
+		if(done){
+			break;
+		}
+	
+	}	
+	return current;
+}
+
+template<typename T>
+std::vector<T> gradientDescent(const csrMatrix<T> &mtr, const std::vector<T> &v, const std::vector<T> &start, const T tolerance, const size_t nmax){
+	std::vector<T> current = start;
+	for(size_t n = 0; n < nmax; n++){
+		const std::vector<T> discrepancy = mtr * current - v;
+		const T tau = dot(discrepancy, discrepancy) / dot(discrepancy, mtr * discrepancy);
+		current = current - tau * (mtr * current - v);
+
+		bool done = 1;
+		for(T error : mtr * current - v){
+			if(std::abs(error) > tolerance){
+				done = 0;
+				break;
+			}
+		}
+		if(done){
+			break;
+		}
+	}
+	return current;
+}
+
+template<typename T>
+std::vector<T> symGaussSeidelMethod(const csrMatrix<T> &mtr, const	std::vector<T> &v, const std::vector<T> &start, const T tolerance, const size_t Nmax){
+	std::vector<T> next = std::vector<T>(start.size());
+	std::vector<T> current = start;
+	bool reverse = false;
+	for(size_t n = 0; n < Nmax; n++){
+		for(size_t h = 0; h < start.size(); h++){
+			T Dh = 1 / mtr(!reverse ? h : start.size() - 1 - h, !reverse ? h : start.size() - 1 - h);
+			T tmp = mtr.mulRow(current, !reverse ? h : start.size() - 1 - h, [](size_t tmph, size_t tmpw) -> bool {return tmph != tmpw;});
+			current[!reverse ? h : start.size() - 1 - h] = Dh * (v[!reverse ? h : start.size() - 1 - h] - tmp);
+		}
+		reverse = !reverse;
 
 		bool done = 1;
 		for(T error : mtr * current - v){
