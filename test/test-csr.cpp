@@ -105,6 +105,18 @@ TEST(csr, sym_gauss_seidel_method){
 	}
 }
 
+TEST(csr, conjurate_gradient_method){
+	std::vector<double> data = {5, -2, 0, -1, -2, 3, 0, -0.2, 0, 0, 7, 0, -1, -0.2, 0, 2};
+	csrMatrix<double> mtr = csrMatrix<double>(data, 4);
+	std::vector<double> v = {-4, 0, -2, 9};
+	std::vector<double> start = {1, 1, 1, 1};
+	std::vector<double> res = conjurateGradientMethod(mtr, v, start, 0.0001, 1000);
+	std::vector<double> correct = {0.37555555555555556, 0.56666666666666667, -0.28571428571428571, 4.74444444444444444};
+	for(size_t i = 0; i < res.size(); i++){
+		ASSERT_NEAR(res[i], correct[i], 0.0001);
+	}
+}
+
 // TEST(csr, problem1){
 // 	std::vector<int> data = {8, 9, 0, 7, 1, 6, 0, 1, 2, 8, 3, 0, 9, 0, 0, 1};
 // 	csrMatrix<int> mtr(data, 4);

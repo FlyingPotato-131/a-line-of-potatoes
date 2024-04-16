@@ -107,7 +107,7 @@ std::vector<T> simpleIterMethod(const csrMatrix<T> &mtr, const std::vector<T> &v
 
 		bool done = 1;
 		for(T error : mtr * current - v){
-			if(std::abs(error) > tolerance){
+			if(!(std::abs(error) <= tolerance)){
 				done = 0;
 				break;
 			}
@@ -129,7 +129,7 @@ size_t simpleIterMethodCounter(const csrMatrix<T> &mtr, const std::vector<T> &v,
 
 		bool done = 1;
 		for(T error : mtr * current - v){
-			if(std::abs(error) > tolerance){
+			if(!(std::abs(error) <= tolerance)){
 				done = 0;
 				break;
 			}
@@ -159,7 +159,7 @@ std::vector<T> chebyshevSIM(const csrMatrix<T> &mtr, const std::vector<T> &v, co
 
 		bool done = 1;
 		for(T error : mtr * current - v){
-			if(std::abs(error) > tolerance){
+			if(!(std::abs(error) <= tolerance)){
 				done = 0;
 				break;
 			}
@@ -182,7 +182,7 @@ std::vector<T> jakobiMethod(const csrMatrix<T> &mtr, const std::vector<T> &v, co
 
 		bool done = 1;
 		for(T error : mtr * current - v){
-			if(std::abs(error) > tolerance){
+			if(!(std::abs(error) <= tolerance)){
 				done = 0;
 				break;
 			}
@@ -207,7 +207,7 @@ std::vector<T> gaussSeidelMethod(const csrMatrix<T> &mtr, const	std::vector<T> &
 
 		bool done = 1;
 		for(T error : mtr * current - v){
-			if(std::abs(error) > tolerance){
+			if(!(std::abs(error) <= tolerance)){
 				done = 0;
 				break;
 			}
@@ -230,7 +230,7 @@ std::vector<T> gradientDescent(const csrMatrix<T> &mtr, const std::vector<T> &v,
 
 		bool done = 1;
 		for(T error : mtr * current - v){
-			if(std::abs(error) > tolerance){
+			if(!(std::abs(error) <= tolerance)){
 				done = 0;
 				break;
 			}
@@ -257,7 +257,7 @@ std::vector<T> symGaussSeidelMethod(const csrMatrix<T> &mtr, const	std::vector<T
 
 		bool done = 1;
 		for(T error : mtr * current - v){
-			if(std::abs(error) > tolerance){
+			if(!(std::abs(error) <= tolerance)){
 				done = 0;
 				break;
 			}
@@ -267,5 +267,34 @@ std::vector<T> symGaussSeidelMethod(const csrMatrix<T> &mtr, const	std::vector<T
 		}
 	
 	}	
+	return current;
+}
+
+template<typename T>
+std::vector<T> conjurateGradientMethod(const csrMatrix<T> &mtr, const std::vector<T> &v, const std::vector<T> &start, const T tolerance, const size_t Nmax){
+	std::vector<T> current = start;
+	std::vector<T> discrepancy = mtr * current - v;
+	std::vector<T> orth = discrepancy;
+	for(size_t n = 0; n < Nmax; n++){
+		T alpha = dot(orth, discrepancy) / dot(orth, mtr * orth);
+		current = current - alpha * orth;
+		std::vector <T> discrepancy1 = mtr * current - v;
+		if(dot(orth, orth) == 0)
+			return current;
+		T beta = dot(discrepancy1, discrepancy1) / dot(orth, discrepancy);
+		discrepancy = discrepancy1;
+		orth = discrepancy + beta * orth;
+
+		bool done = 1;
+		for(T error : mtr * current - v){
+			if(!(std::abs(error) <= tolerance)){
+				done = 0;
+				break;
+			}
+		}
+		if(done){
+			break;
+		}
+	}
 	return current;
 }
