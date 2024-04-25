@@ -5,6 +5,8 @@
 #include <functional>
 #include <math.h>
 #include <iostream>
+#include <algorithm>
+#include "dense-matrix.h"
 
 template<typename T>
 struct csrMatrix{
@@ -13,13 +15,19 @@ public:
 	std::vector<size_t> columns;
 	std::vector<size_t> rows;
 public:
+	csrMatrix();
 	csrMatrix(const std::vector<T> &data, std::size_t width);
+	csrMatrix(const std::vector<T> &values, const std::vector<size_t> &columns, const std::vector<size_t> &rows);
 	bool validate(const std::vector<T> &values, const std::vector<size_t> &columns, const std::vector<size_t> &rows) const;
 	T operator()(size_t h, size_t w) const;
 	std::vector<T> operator*(const std::vector<T> &v) const;
 	std::vector<T> mulCondition(const std::vector<T> &v, const std::function<bool(size_t, size_t)> condition) const; //multiply matrix by vector but values at positions h, w such that condition(h, w) == false are zeroed
 	T mulRow(const std::vector<T> &v, size_t row, const std::function<bool(size_t, size_t)> condition = nullptr) const; //multiply row by vector
+	// csrMatrix transpose();
 };
+
+template<typename T>
+csrMatrix<T>::csrMatrix() : values(), columns(), rows(){}
 
 template<typename T>
 csrMatrix<T>::csrMatrix(const std::vector<T> &data, size_t width) : rows(data.size() / width + 1){
@@ -44,6 +52,9 @@ csrMatrix<T>::csrMatrix(const std::vector<T> &data, size_t width) : rows(data.si
 		}
 	}
 }
+
+template<typename T>
+csrMatrix<T>::csrMatrix(const std::vector<T> &_values, const std::vector<size_t> &_columns, const std::vector<size_t> &_rows) : values(_values), columns(_columns), rows(_rows){}
 
 template<typename T>
 bool csrMatrix<T>::validate(const std::vector<T> &vals, const std::vector<size_t> &cols, const std::vector<size_t> &rws) const{
@@ -98,6 +109,45 @@ T csrMatrix<T>::mulRow(const std::vector<T> &v, size_t row, const std::function<
 	}
 	return sum;
 }
+
+// template<typename T>
+// csrMatrix<T> csrMatrix<T>::transpose(){
+// 	std::vector<T> retvals(this->values.size());
+// 	std::vector<size_t> retcols(this->rows.size(), 0);
+// 	std::vector<size_t> retrows(*std::max_element(this->columns.begin(), this->columns.end()) + 1, 0);
+
+// 	for(size_t i = 0; i < this->values.size(); i++){
+// 		retrows[this->columns[i] + 1]++;
+// 	}
+
+// 	size_t s = 0;
+// 	for(size_t i = 2; i <= retrows.size() - 1; i++){
+// 		size_t tmp = retrows[i];
+// 		retrows[i] = s;
+// 		s += tmp;
+// 	}
+
+// 	for(size_t h = 0; h < this->rows.size(); h++){
+// 		for(size_t w = this->rows[h]; w < this->rows[h + 1]; w++){
+// 			size_t row = this->columns[w];
+// 			size_t col = retrows[row + 1];
+// 			retvals[col] = this->values[w];
+// 			retcols[col] = h;
+// 			retrows[row + 1]++;
+// 		}
+// 	}
+
+// 	// for(size_t h = 0; h < this->rows.size() - 1; h++){
+// 	// 	for(size_t w = retrows[h]; w < retrows[h + 1]; w++){
+// 	// 		const size_t i = retrows[this->columns[w] + 1];
+// 	// 		retrows[this->columns[w]]++;
+// 	// 		retvals[i] = this->values[w];
+// 	// 		retcols[i] = h;
+// 	// 	}	
+// 	// }
+// 	// retrows.pop_back();
+// 	return csrMatrix<T>(retvals, retcols, retrows);
+// }
 
 template<typename T>
 std::vector<T> simpleIterMethod(const csrMatrix<T> &mtr, const std::vector<T> &v, const std::vector<T> &start, const T tolerance, const size_t nmax, const T tau){
@@ -297,4 +347,113 @@ std::vector<T> conjurateGradientMethod(const csrMatrix<T> &mtr, const std::vecto
 		}
 	}
 	return current;
+}
+
+template<typename T>
+std::pair<denseMatrix<T>, denseMatrix<T>> krylovONB(const csrMatrix<T> &mtr, const std::vector<T> &v, const std::vector<T> &start){
+	denseMatrix<T> onb(mtr.rows.size() - 1, mtr.rows.size() - 1);
+	denseMatrix<T> h(mtr.rows.size(), mtr.rows.size() - 1);
+	std::vector<T> r0 = mtr * start - v;
+	std::vector<T> v0 = r0 / abs(r0);
+
+	for(size_t i = 0; i < v0.size(); i++){
+		onb(i, 0) = v0[i];
+	}
+
+	for(size_t j = 0; j < mtr.rows.size() - 1; j++){
+		std::vector<T> t = mtr * onb.column(j);
+		for(size_t k = 0; k < j; k++){
+			h(k, j) = dot(onb.column(k), t);
+			t = t - h(k, j) * onb.column(k);
+		}
+		h(j + 1, j) = abs(t);
+		std::vector<T> vj = t / (h(j + 1, j));
+		for(size_t i = 0; i < vj.size() - 1; i++){
+			onb(i, j + 1) = vj[i];
+		}
+	}
+	return std::pair(onb, h);
+}
+
+template<typename T>
+std::vector<T> gmresm(const csrMatrix<T> &mtr, const std::vector<T> &v, const std::vector<T> &start, const size_t dim, const size_t restarts, const T tolerance){
+	std::vector<T> ret = start;
+	std::vector<std::vector<T>> V(dim + 1, std::vector<T>(v.size()));
+	// denseMatrix<T> V(v.size(), dim + 1);
+	denseMatrix<T> H(dim + 1, dim);
+	std::vector<T> residual = v - mtr * start;
+
+	std::vector<T> givensS(dim + 1);
+	std::vector<T> givensC(dim + 1);
+
+	T rho = abs(residual);
+	// size_t restarted = 0;
+
+	for(size_t restart = 0; restart < restarts; restart++){
+		V[0] = residual / rho;
+		std::vector<T> s(dim + 1);
+		s[0] = rho;
+		for(size_t iter = 0; iter < dim; iter++){
+			V[iter + 1] = mtr * V[iter];
+			std::vector<T> w = mtr * V[iter];
+			for(size_t row = 0; row <= iter; row++){
+				H(row, iter) = dot(w, V[iter]);
+				w = w - H(row, iter) * V[row];
+			}
+			H(iter + 1, iter) = abs(w);
+			V[iter + 1] = w / H(iter + 1, iter);
+
+			for(size_t row = 0; row < iter; row++){
+				T tmp = givensS[row] * H(row, iter) + givensC[row] * H(row + 1, iter);
+				H(row + 1, iter) = -givensC[row] * H(row, iter) + givensS[row] * H(row + 1, iter);
+				H(row, iter) = tmp;
+			}
+
+			if(H(iter + 1, iter) == 0.0){
+				givensS[iter] = 1;
+				givensC[iter] = 0;
+			}else if(std::abs(H(iter + 1, iter)) > std::abs(H(iter, iter))){
+				T tmp = H(iter, iter) / H(iter + 1, iter);
+				givensC[iter] = 1 / sqrt(1 + tmp * tmp);
+				givensS[iter] = tmp * givensC[iter];
+			}else{
+				T tmp = H(iter + 1, iter) / H(iter, iter);
+				givensS[iter] = 1 / sqrt(1 + tmp * tmp);
+				givensC[iter] = tmp * givensS[iter];
+			}
+
+			T tmp = givensS[iter] * H(iter, iter) + givensC[iter] * H(iter + 1, iter);
+			H(iter + 1, iter) = -givensC[iter] * H(iter, iter) + givensS[iter] * H(iter + 1, iter);
+			H(iter, iter) = tmp;
+
+			tmp = givensS[iter] * s[iter] + givensC[iter] * s[iter + 1];
+			s[iter + 1] = -givensC[iter] * s[iter] + givensS[iter] * s[iter + 1];
+			s[iter] = tmp;
+
+			rho = std::abs(s[iter + 1]);
+			if(rho < tolerance * abs(v)){
+				for(int i = int(iter); i >= 0; i--){
+					s[size_t(i)] = s[size_t(i)] / H(size_t(i), size_t(i));
+					for(int j = i - 1; j >= 0; j--){
+						s[size_t(j)] -= s[size_t(i)] * H(size_t(j), size_t(i));
+					}
+				}
+				for(size_t i = 0; i <= iter; i++)
+					ret = ret + V[i] * s[i];
+				return ret;
+			}
+		}
+		for(int i = int(dim - 2); i >= 0; i--){
+			s[size_t(i)] = s[size_t(i)] / H(size_t(i), size_t(i));
+			for(int j = i - 1; j >= 0; j--){
+				s[size_t(j)] -= s[size_t(i)] * H(size_t(j), size_t(i));
+			}
+		}
+		for(size_t i = 0; i <= (dim > 2 ? dim - 2 : 0); i++){
+			ret = ret + V[i] * s[i];
+		}
+		residual = v - mtr * ret;
+		rho = abs(residual);
+	}
+	return ret;
 }

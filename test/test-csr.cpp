@@ -1,4 +1,5 @@
 #include "csr-matrix.h"
+#include "dense-matrix.h"
 #include <gtest/gtest.h>
 #include <fstream>
 
@@ -20,6 +21,15 @@ TEST(csr, get_element){
 	ASSERT_EQ(mtr(1, 1), 0);
 	ASSERT_EQ(mtr(2, 3), 11);
 }
+
+// TEST(csr, transpose){
+// 	std::vector<int> v = {1, 2, 0, 3, 0, 0, 4, 0, 0, 1, 0, 11};
+// 	size_t width = 4;
+// 	csrMatrix<int> mtr = csrMatrix<int>(v, width).transpose();
+// 	ASSERT_EQ(mtr(2, 1), 4);
+// 	ASSERT_EQ(mtr(1, 1), 0);
+// 	ASSERT_EQ(mtr(3, 2), 11);
+// }
 
 TEST(csr, vector_multiply){
 	std::vector<int> v = {1, 2, 0, 3, 0, 0, 4, 0, 0, 1, 0, 11};
@@ -114,6 +124,29 @@ TEST(csr, conjurate_gradient_method){
 	std::vector<double> correct = {0.37555555555555556, 0.56666666666666667, -0.28571428571428571, 4.74444444444444444};
 	for(size_t i = 0; i < res.size(); i++){
 		ASSERT_NEAR(res[i], correct[i], 0.0001);
+	}
+}
+
+TEST(csr, krylov_hessenberg){
+	std::vector<double> data = {5, -2, 0, -1, -2, 3, 0, -0.2, 0, 0, 7, 0, -1, -0.2, 0, 2};
+	csrMatrix<double> mtr = csrMatrix<double>(data, 4);
+	std::vector<double> v = {-4, 0, -2, 9};
+	std::vector<double> start = {1, 1, 1, 1};
+	auto pair = krylovONB(mtr, v, start);
+	ASSERT_EQ(pair.second(4, 0), 0);
+	ASSERT_EQ(pair.second(4, 1), 0);
+	ASSERT_EQ(pair.second(3, 0), 0);
+}
+
+TEST(csr, gmres){
+	std::vector<double> data = {5, -2, 0, -1, -2, 3, 0, -0.2, 0, 0, 7, 0, -1, -0.2, 0, 2};
+	csrMatrix<double> mtr = csrMatrix<double>(data, 4);
+	std::vector<double> v = {-4, 0, -2, 9};
+	std::vector<double> start = {1, 1, 1, 1};
+	std::vector<double> res = gmresm(mtr, v, start, 4, 5, 0.0001);
+	std::vector<double> correct = {0.37555555555555556, 0.56666666666666667, -0.28571428571428571, 4.74444444444444444};
+	for(size_t i = 0; i < res.size(); i++){
+		ASSERT_NEAR(res[i], correct[i], 0.001);
 	}
 }
 
