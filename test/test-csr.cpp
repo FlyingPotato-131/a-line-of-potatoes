@@ -150,6 +150,32 @@ TEST(csr, gmres){
 	}
 }
 
+TEST(csr, eeee){
+	std::vector<double> mtrdata = {17, 0, 0, 0, 0, 19.0, 0, 0, 0, 0, 22.0, 0, 0, 0, 0, 25.5};
+	csrMatrix<double> mtr(mtrdata, 4);
+	std::vector<double> v = {4, 4, 4, 4};
+	std::vector<double> start = {0, 0, 0, 0};
+
+	std::ofstream data;
+	data.open("../timestamps-iter-problem2/data.csv");
+	data << "Niter, r1x, r1y, r2x, r2y, r3x, r3y, r4x, r4y, r5x, r5y\n";
+	data << "0,0,0,0,0,0,0,0,0,0,0\n";
+
+	for(size_t i = 1; i < 100; i++){
+		data << i << ",";
+		std::vector<double> res1 = simpleIterMethod(mtr, v, start, 0.0, i, 0.9 * 2.0 / 25.0);
+		data << res1[0] << "," << res1[3] << ",";
+		std::vector<double> res2 = simpleIterMethod(mtr, v, start, 0.0, i, 2.0 / (25.0 + 17.0));
+		data << res2[0] << "," << res2[3] << ",";
+		std::vector<double> res3 = gradientDescent(mtr, v, start, 0.0, i);
+		data << res3[0] << "," << res3[3] << ",";
+		std::vector<double> res4 = chebyshevSIM(mtr, v, start, 0.0, i, 17.0, 25.0);
+		data << res4[0] << "," << res4[3] << ",";
+		std::vector<double> res5 = conjurateGradientMethod(mtr, v, start, 0.0, i);
+		data << res5[0] << "," << res5[3] << "\n";
+	}
+}
+
 // TEST(csr, problem1){
 // 	std::vector<int> data = {8, 9, 0, 7, 1, 6, 0, 1, 2, 8, 3, 0, 9, 0, 0, 1};
 // 	csrMatrix<int> mtr(data, 4);
